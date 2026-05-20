@@ -1,0 +1,5 @@
+outs:
+- md5: a40d6cf5abbe90dc80c7a95fe52d3ea1
+  size: 107211
+  hash: md5
+  path: Battery_dataset.csv
