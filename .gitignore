@@ -2,7 +2,7 @@ venv/
 __pycache__/
 *.pyc
 .env
-data/*.csv
+data/
 models/
 mlruns/
 .ipynb_checkpoints/
