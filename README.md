@@ -101,3 +101,30 @@ Based on the evaluation metrics, Linear Regression was selected as the best-perf
 - strong overall generalization performance
 
 These results indicate that the dataset exhibits relatively linear relationships between battery measurements and Remaining Useful Life (RUL).
+
+## Feature Importance Analysis
+Feature importance analysis was performed using the Random Forest Regressor model because tree-based models can quantify the contribution of each feature toward prediction performance.
+
+Feature importance analysis was performed using the Random Forest Regressor model to identify the variables that most strongly influence battery Remaining Useful Life (RUL) prediction.
+
+The results showed that the most influential features were:
+
+| Feature | Importance |
+|---|---|
+| BCt | 0.423 |
+| SOH | 0.322 |
+| cycle | 0.211 |
+
+All remaining features had relatively small importance values (< 0.01).
+
+### Interpretation
+
+- **BCt** was identified as the most important predictor, contributing approximately 42% of the model importance. This suggests that BCt has a strong relationship with battery degradation and Remaining Useful Life.
+
+- **SOH (State of Health)** was the second most influential feature, contributing about 32% importance. This indicates that battery health strongly affects RUL prediction accuracy.
+
+- **cycle** also showed significant influence (~21%), confirming that the number of charge/discharge cycles is an important degradation indicator.
+
+- Other variables such as `chI`, `disV`, `chT`, `disI`, `chV`, and `disT` contributed minimally to the prediction model.
+
+Overall, the feature importance analysis indicates that battery degradation behavior in this dataset is primarily driven by BCt, SOH, and cycle-related characteristics.
