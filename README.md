@@ -110,10 +110,10 @@ Feature importance analysis was performed using the Random Forest Regressor mode
 The results showed that the most influential features were:
 
 | Feature | Importance |
-|---|---|
-| BCt | 0.423 |
-| SOH | 0.322 |
-| cycle | 0.211 |
+=======================
+| BCt     |  0.423     |
+| SOH     |  0.322     |
+| cycle   |  0.211     |
 
 All remaining features had relatively small importance values (< 0.01).
 
