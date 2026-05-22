@@ -167,3 +167,273 @@ The best trained model was saved locally as:
 
 ```text
 models/best_model.pkl
+
+# Stage 3: LLM Interface for Battery RUL Prediction
+
+## Overview
+
+This stage implements a Streamlit-based battery-health assistant that connects natural language user input with the trained machine learning Remaining Useful Life (RUL) prediction model.
+
+The application allows users to describe battery conditions in conversational language. The system extracts the required battery features, validates the inputs, invokes the trained machine learning model, and generates an engineering explanation of the prediction.
+
+---
+
+# Stage 3 Requirements Coverage
+
+| Reviewer Requirement | Implementation in This Project |
+|---|---|
+| LLM correctly parses natural language input into model features | The application extracts battery features such as voltage, current, temperature, cycle number, capacity time, and SOH from conversational text |
+| Trained model is loaded and invoked with parsed features | The trained `best_model.pkl` model is loaded using `joblib` and used for inference |
+| Response is clear, contextual, and includes the prediction | The application explains battery degradation and Remaining Useful Life in engineering context |
+| Edge cases handled gracefully | Missing values, incomplete inputs, and ambiguous queries are detected before prediction |
+| Interface is functional and easy to use | The project uses a Streamlit web application for user interaction |
+
+---
+
+# Application Workflow
+
+```text
+User Natural Language Query
+            ↓
+Input Parsing
+            ↓
+Feature Validation
+            ↓
+Model Prediction
+            ↓
+Engineering Explanation
+            ↓
+Prediction Display
+```
+
+---
+
+# 1. Natural Language Input Parsing
+
+The application accepts conversational battery descriptions from the user.
+
+## Example User Input
+
+```text
+Predict RUL for cycle 120, charge current 1.5,
+charge voltage 4.1, charge temperature 30,
+discharge current 1.2, discharge voltage 3.7,
+discharge temperature 28, battery capacity time 250,
+and SOH 85.
+```
+
+The system extracts structured battery features required by the machine learning model.
+
+## Parsed Features
+
+```python
+{
+    "cycle": 120,
+    "chI": 1.5,
+    "chV": 4.1,
+    "chT": 30,
+    "disI": 1.2,
+    "disV": 3.7,
+    "disT": 28,
+    "BCt": 250,
+    "SOH": 85
+}
+```
+
+This demonstrates that the system converts conversational text into structured machine learning inputs.
+
+---
+
+# 2. Model Invocation
+
+The trained battery Remaining Useful Life prediction model is stored in:
+
+```text
+models/best_model.pkl
+```
+
+The application loads the trained model using `joblib`.
+
+## Example
+
+```python
+model = joblib.load("models/best_model.pkl")
+```
+
+The extracted features are converted into a pandas DataFrame and passed into the trained model.
+
+## Example
+
+```python
+prediction = model.predict(input_df)
+```
+
+This ensures that the actual trained machine learning model is used for inference.
+
+---
+
+# 3. Contextual Response Generation
+
+The application generates engineering explanations instead of returning only a numerical prediction.
+
+## Example Output
+
+```text
+Predicted Remaining Useful Life: 85.4 cycles
+
+Battery Status: High degradation
+
+Explanation:
+The battery has a low remaining useful life and shows significant degradation.
+This may indicate reduced energy storage capability and possible need for replacement or maintenance soon.
+```
+
+This helps users understand the practical meaning of the prediction in battery engineering context.
+
+---
+
+# 4. Edge Case Handling
+
+The application validates user inputs before prediction.
+
+Handled edge cases include:
+
+- missing battery information
+- incomplete queries
+- ambiguous requests
+- empty inputs
+- invalid feature combinations
+
+## Example Missing Input
+
+```text
+Predict battery RUL for cycle 120 and charge current 1.5
+```
+
+## Application Response
+
+```text
+Missing required information:
+Please provide charge voltage, charge temperature,
+discharge voltage, discharge temperature,
+battery capacity time, and SOH.
+```
+
+This prevents invalid predictions and improves reliability.
+
+---
+
+# 5. Streamlit Interface
+
+The interface is implemented using Streamlit.
+
+The application includes:
+
+- text input area
+- prediction button
+- parsed feature visualization
+- engineering explanation output
+
+This creates a simple and user-friendly battery-health assistant application.
+
+---
+
+# How to Run the Application
+
+## Step 1: Activate Virtual Environment
+
+```bash
+cd ~/battery-rul-llm-project
+source .venv/bin/activate
+```
+
+---
+
+## Step 2: Run Streamlit Application
+
+```bash
+python -m streamlit run src/app.py
+```
+
+---
+
+# Example Questions for Testing
+
+## Example 1
+
+```text
+Predict RUL for cycle 120, charge current 1.5,
+charge voltage 4.1, charge temperature 30,
+discharge current 1.2, discharge voltage 3.7,
+discharge temperature 28, battery capacity time 250,
+and SOH 85.
+```
+
+``` response
+Prediction Result
+Predicted Remaining Useful Life: 70.62 cycles
+
+Battery Status: High degradation
+
+Explanation:
+The battery has a low remaining useful life. This suggests significant degradation, reduced capacity, and possible need for replacement or maintenance soon.
+```
+
+## Example 2
+
+```text
+Battery cycle 250, charge current 2.0,
+charge voltage 4.0, SOH 70,
+discharge voltage 3.5, discharge current 1.8,
+charge temperature 35, discharge temperature 32,
+capacity time 180.
+```
+``` response
+Prediction Result
+Predicted Remaining Useful Life: -78.66 cycles
+
+Battery Status: High degradation
+
+Explanation:
+The battery has a low remaining useful life. This suggests significant degradation, reduced capacity, and possible need for replacement or maintenance soon.
+```
+-------
+
+## Example 3: Missing Features
+
+```text
+Predict battery life for cycle 100
+```
+
+Expected application behavior:
+
+```text
+The application asks the user to provide missing battery information before prediction.
+```
+
+---
+
+# Technologies Used
+
+| Technology | Purpose |
+|---|---|
+| Python | Core programming language |
+| pandas | Data processing |
+| scikit-learn | Machine learning |
+| Streamlit | Web application |
+| joblib | Model loading |
+| Regex | Natural language feature extraction |
+| python-dotenv | Environment variable management |
+
+---
+
+# Summary
+
+This stage demonstrates complete integration between:
+- natural language input parsing,
+- machine learning inference,
+- engineering response generation,
+- edge case handling,
+- and an interactive Streamlit web application.
+
+The final system allows users to interact with the trained battery Remaining Useful Life prediction model using conversational language while receiving interpretable engineering explanations about battery degradation and battery health.
