@@ -1,8 +1,28 @@
+# Virtual environments
 venv/
+.venv/
+broken_venv/
+
+# Python cache
 __pycache__/
 *.pyc
+.pytest_cache/
+
+# Environment variables / API keys
 .env
-data/**/*.csv
+
+# Data files
+data/*.csv
+data/raw/*.csv
+data/processed/*.csv
+
+# Model files
 models/
+*.pkl
+*.joblib
+
+# MLflow tracking files
 mlruns/
+
+# Jupyter files
 .ipynb_checkpoints/
