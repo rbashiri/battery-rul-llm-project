@@ -128,3 +128,42 @@ All remaining features had relatively small importance values (< 0.01).
 - Other variables such as `chI`, `disV`, `chT`, `disI`, `chV`, and `disT` contributed minimally to the prediction model.
 
 Overall, the feature importance analysis indicates that battery degradation behavior in this dataset is primarily driven by BCt, SOH, and cycle-related characteristics.
+
+## MLflow Experiment Tracking
+
+This project uses MLflow to track and compare battery Remaining Useful Life (RUL) prediction experiments.
+
+Each experiment run logs:
+- dataset information
+- model hyperparameters
+- evaluation metrics
+- trained model artifacts
+
+The following metrics were tracked:
+- MAE
+- MSE
+- RMSE
+- R²
+
+Five experiment runs were completed using different regression models and hyperparameter configurations:
+- Linear Regression
+- Random Forest Regressor with different tree depths
+- Gradient Boosting Regressor with different learning rates
+
+MLflow was also used to programmatically compare all experiment runs using `mlflow.search_runs()`.
+
+The best experiment run was automatically identified based on the lowest RMSE value.
+
+### Best MLflow Run
+
+| Metric | Value |
+|---|---|
+| Best Model | Linear Regression |
+| RMSE | 18.0005 |
+| MAE | 16.8801 |
+| R² | 0.9309 |
+
+The best trained model was saved locally as:
+
+```text
+models/best_model.pkl
