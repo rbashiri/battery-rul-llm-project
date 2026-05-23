@@ -437,3 +437,76 @@ This stage demonstrates complete integration between:
 - and an interactive Streamlit web application.
 
 The final system allows users to interact with the trained battery Remaining Useful Life prediction model using conversational language while receiving interpretable engineering explanations about battery degradation and battery health.
+
+# Dockerfile
+
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 8501
+
+CMD ["python", "-m", "streamlit", "run", "src/app.py", "--server.address=0.0.0.0"]
+```
+
+---
+
+# Build Docker Image
+
+```bash
+sudo docker build -t battery-rul-app .
+```
+
+---
+
+# Run Docker Container
+
+```bash
+sudo docker run -p 8501:8501 battery-rul-app
+```
+
+---
+
+# Open Application Locally
+
+```text
+http://localhost:8501
+Note:
+This local address only works while the Docker container or local Streamlit server is actively running.
+```
+---
+
+# Public Streamlit Deployment
+
+The deployed public application is available at:
+
+```text
+app link : https://battery-rul-llm-projectgit-rbuqw5bw7ot2ios8hfmmj5.streamlit.app/
+```
+
+---
+
+# Deployment and Production Readiness
+
+This project demonstrates:
+
+- machine learning model deployment
+- Streamlit web application deployment
+- Docker containerization
+- reproducible environments
+- dependency management
+- GitHub integration
+- cloud deployment workflow
+
+The final application successfully integrates:
+- natural language processing concepts,
+- machine learning inference,
+- engineering response generation,
+- and interactive web deployment.
