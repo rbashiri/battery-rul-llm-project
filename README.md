@@ -610,3 +610,29 @@ configs/config.yaml
 ```
 
 and uses the values defined there for data loading, splitting, and model training.
+## Reflection
+
+This capstone project allowed me to build a bridge between my data science learning and my previous experience working in the battery and electrochemistry field. It motivated me to continue learning and improving my machine learning and deployment skills.
+
+For this project, I used a battery dataset from Kaggle and developed a complete machine learning workflow including preprocessing, model training, MLflow experiment tracking, testing with pytest, Docker containerization, and deployment using Streamlit Cloud.
+
+One of the biggest challenges was working with Linux inside Windows using WSL. Setting up the environment, managing permissions, and configuring Docker were difficult at times. Some commands required administrator access, and I experienced several issues related to package installation, Docker permissions, and virtual environments. At one point, I needed to clean and recreate my Linux environment to continue the project successfully.
+
+Despite these challenges, the project helped me better understand the concepts covered during the 17 sprints of the program. It gave me confidence in connecting machine learning, software engineering, and deployment workflows into a complete real-world application.
+
+This capstone project is an important stepping stone toward future job applications in data science, machine learning, battery analytics, and engineering-related fields.
+
+With more time, I would like to:
+- improve the natural language interface using more advanced LLM techniques
+- add more battery datasets and improve model generalization
+- implement automated CI/CD workflows
+- improve the user interface and engineering explanations
+- explore cloud deployment and monitoring tools further
+
+My next goal is to revisit all previous sprints and practice rebuilding parts of the project again. I believe repetition and hands-on practice will help strengthen my understanding and improve my technical confidence.
+
+I would appreciate any feedback or suggestions on how I can improve this project further and continue growing in future machine learning and data science projects.
+
+
+Robabeh 
+5/23/2026
