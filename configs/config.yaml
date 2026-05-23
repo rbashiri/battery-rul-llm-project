@@ -1,0 +1,18 @@
+data:
+  input_path: "/home/susan/battery-rul-llm-project/data/processed/battery_cleaned.csv"
+  target_column: "RUL"
+  test_size: 0.2
+  validation_size: 0.2
+  random_state: 42
+
+model:
+  random_forest:
+    n_estimators: 100
+    max_depth: 10
+    random_state: 42
+
+  gradient_boosting:
+    n_estimators: 100
+    learning_rate: 0.1
+    max_depth: 3
+    random_state: 42

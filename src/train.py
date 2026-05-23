@@ -1,4 +1,5 @@
 import os
+import yaml
 import joblib
 import mlflow
 import mlflow.sklearn
@@ -19,11 +20,32 @@ from sklearn.metrics import (
     r2_score
 )
 
+# ==========================================
+# Load configuration file
+# ==========================================
+
+with open("configs/config.yaml", "r") as file:
+    config = yaml.safe_load(file)
+
+# ==========================================
+# Read values from YAML
+# ==========================================
+
+input_path = config["data"]["input_path"]
+
+target_column = config["data"]["target_column"]
+
+test_size = config["data"]["test_size"]
+
+validation_size = config["data"]["validation_size"]
+
+random_state = config["data"]["random_state"]
+
+# ==========================================
+# Evaluation function
+# ==========================================
 
 def evaluate_model(model_name, y_true, y_pred):
-    """
-    Calculate regression evaluation metrics.
-    """
 
     mae = mean_absolute_error(y_true, y_pred)
 
@@ -42,39 +64,33 @@ def evaluate_model(model_name, y_true, y_pred):
     }
 
 
+# ==========================================
+# Main function
+# ==========================================
+
 def main():
 
-    # ==============================
-    # Load cleaned dataset
-    # ==============================
-
-    input_path = (
-        "/home/susan/battery-rul-llm-project/"
-        "data/processed/battery_cleaned.csv"
-    )
+    # ======================================
+    # Load dataset
+    # ======================================
 
     df = pd.read_csv(input_path)
 
     print("Dataset loaded successfully")
+
     print("Dataset shape:", df.shape)
 
-    # ==============================
-    # Select target column
-    # ==============================
-
-    target_column = "RUL"
-
-    # ==============================
+    # ======================================
     # Create features and target
-    # ==============================
+    # ======================================
 
     features = df.drop(columns=[target_column])
 
     target = df[target_column]
 
-    # ==============================
-    # Remove ID column
-    # ==============================
+    # ======================================
+    # Remove battery ID column
+    # ======================================
 
     if "battery_id" in features.columns:
 
@@ -82,9 +98,9 @@ def main():
 
         print("battery_id column removed")
 
-    # ==============================
+    # ======================================
     # Remove text columns
-    # ==============================
+    # ======================================
 
     text_columns = features.select_dtypes(
         include="object"
@@ -93,30 +109,31 @@ def main():
     if len(text_columns) > 0:
 
         print("Text columns removed:")
+
         print(list(text_columns))
 
         features = features.drop(columns=text_columns)
 
-    # ==============================
+    # ======================================
     # Train-test split
-    # ==============================
+    # ======================================
 
     X_temp, X_test, y_temp, y_test = train_test_split(
         features,
         target,
-        test_size=0.2,
-        random_state=42
+        test_size=test_size,
+        random_state=random_state
     )
 
-    # ==============================
+    # ======================================
     # Train-validation split
-    # ==============================
+    # ======================================
 
     X_train, X_val, y_train, y_val = train_test_split(
         X_temp,
         y_temp,
-        test_size=0.25,
-        random_state=42
+        test_size=validation_size,
+        random_state=random_state
     )
 
     print("Train shape:", X_train.shape)
@@ -125,62 +142,42 @@ def main():
 
     print("Test shape:", X_test.shape)
 
-    # ==============================
+    # ======================================
     # Define models
-    # ==============================
+    # ======================================
 
     models = {
 
-    # Run 1
-    "Linear Regression":
-    LinearRegression(),
+        "Linear Regression":
+        LinearRegression(),
 
-    # Run 2
-    "Random Forest Depth 5":
-    RandomForestRegressor(
-        n_estimators=100,
-        max_depth=5,
-        random_state=42
-    ),
+        "Random Forest":
+        RandomForestRegressor(
+            n_estimators=config["model"]["random_forest"]["n_estimators"],
+            max_depth=config["model"]["random_forest"]["max_depth"],
+            random_state=config["model"]["random_forest"]["random_state"]
+        ),
 
-    # Run 3
-    "Random Forest Depth 10":
-    RandomForestRegressor(
-        n_estimators=200,
-        max_depth=10,
-        random_state=42
-    ),
+        "Gradient Boosting":
+        GradientBoostingRegressor(
+            n_estimators=config["model"]["gradient_boosting"]["n_estimators"],
+            learning_rate=config["model"]["gradient_boosting"]["learning_rate"],
+            max_depth=config["model"]["gradient_boosting"]["max_depth"],
+            random_state=config["model"]["gradient_boosting"]["random_state"]
+        )
+    }
 
-    # Run 4
-    "Gradient Boosting LR 0.1":
-    GradientBoostingRegressor(
-        n_estimators=100,
-        learning_rate=0.1,
-        max_depth=3,
-        random_state=42
-    ),
-
-    # Run 5
-    "Gradient Boosting LR 0.05":
-    GradientBoostingRegressor(
-        n_estimators=200,
-        learning_rate=0.05,
-        max_depth=5,
-        random_state=42
-    )
-}
-
-    # ==============================
+    # ======================================
     # Set MLflow experiment
-    # ==============================
+    # ======================================
 
     mlflow.set_experiment(
         "battery_rul_prediction"
     )
 
-    # ==============================
+    # ======================================
     # Train and evaluate models
-    # ==============================
+    # ======================================
 
     results = []
 
@@ -190,34 +187,30 @@ def main():
 
         print(f"\nTraining {model_name}...")
 
-        # ==========================
-        # Start MLflow run
-        # ==========================
-
         with mlflow.start_run(
             run_name=model_name
         ):
 
-            # ======================
+            # ==================================
             # Train model
-            # ======================
+            # ==================================
 
             model.fit(
                 X_train,
                 y_train
             )
 
-            # ======================
-            # Validation predictions
-            # ======================
+            # ==================================
+            # Validation prediction
+            # ==================================
 
             y_val_pred = model.predict(
                 X_val
             )
 
-            # ======================
-            # Calculate metrics
-            # ======================
+            # ==================================
+            # Evaluate model
+            # ==================================
 
             metrics = evaluate_model(
                 model_name,
@@ -229,9 +222,9 @@ def main():
 
             trained_models[model_name] = model
 
-            # ======================
-            # MLflow parameters
-            # ======================
+            # ==================================
+            # Log parameters
+            # ==================================
 
             mlflow.log_param(
                 "data_path",
@@ -239,26 +232,17 @@ def main():
             )
 
             mlflow.log_param(
-                "data_version",
-                "battery_cleaned.csv"
-            )
-
-            mlflow.log_param(
                 "target_column",
                 target_column
             )
-
-            # ======================
-            # Log hyperparameters
-            # ======================
 
             mlflow.log_params(
                 model.get_params()
             )
 
-            # ======================
+            # ==================================
             # Log metrics
-            # ======================
+            # ==================================
 
             mlflow.log_metric(
                 "MAE",
@@ -280,18 +264,14 @@ def main():
                 metrics["R2"]
             )
 
-            # ======================
-            # Log model artifact
-            # ======================
+            # ==================================
+            # Log model
+            # ==================================
 
             mlflow.sklearn.log_model(
                 model,
                 artifact_path="model"
             )
-
-            # ======================
-            # Print metrics
-            # ======================
 
             print(
                 "MAE:",
@@ -308,9 +288,9 @@ def main():
                 round(metrics["R2"], 4)
             )
 
-    # ==============================
+    # ======================================
     # Compare models
-    # ==============================
+    # ======================================
 
     results_df = pd.DataFrame(results)
 
@@ -323,9 +303,9 @@ def main():
 
     print(results_df)
 
-    # ==============================
+    # ======================================
     # Select best model
-    # ==============================
+    # ======================================
 
     best_model_name = (
         results_df.iloc[0]["Model"]
@@ -339,17 +319,17 @@ def main():
 
     print(best_model_name)
 
-    # ==============================
+    # ======================================
     # Final test prediction
-    # ==============================
+    # ======================================
 
     y_test_pred = best_model.predict(
         X_test
     )
 
-    # ==============================
-    # Final test evaluation
-    # ==============================
+    # ======================================
+    # Final evaluation
+    # ======================================
 
     test_metrics = evaluate_model(
         best_model_name + " Final Test",
@@ -361,27 +341,23 @@ def main():
 
     print(test_metrics)
 
-    # ==============================
+    # ======================================
     # Create reports folder
-    # ==============================
+    # ======================================
 
     os.makedirs(
         "reports",
         exist_ok=True
     )
 
-    # ==============================
-    # Save comparison report
-    # ==============================
+    # ======================================
+    # Save reports
+    # ======================================
 
     results_df.to_csv(
         "reports/model_comparison.csv",
         index=False
     )
-
-    # ==============================
-    # Save final test report
-    # ==============================
 
     test_results_df = pd.DataFrame(
         [test_metrics]
@@ -392,18 +368,18 @@ def main():
         index=False
     )
 
-    # ==============================
+    # ======================================
     # Create models folder
-    # ==============================
+    # ======================================
 
     os.makedirs(
         "models",
         exist_ok=True
     )
 
-    # ==============================
-    # Save best model locally
-    # ==============================
+    # ======================================
+    # Save best model
+    # ======================================
 
     joblib.dump(
         best_model,
@@ -415,87 +391,76 @@ def main():
         "models/best_model.pkl"
     )
 
-    # ==============================
+    # ======================================
     # Feature importance
-    # ==============================
+    # ======================================
 
-    rf_model = trained_models[
-    "Random Forest Depth 10"]
+    if "Random Forest" in trained_models:
 
-    feature_importance = pd.DataFrame({
+        rf_model = trained_models[
+            "Random Forest"
+        ]
 
-        "Feature": X_train.columns,
+        feature_importance = pd.DataFrame({
 
-        "Importance":
-        rf_model.feature_importances_
-    })
+            "Feature": X_train.columns,
 
-    feature_importance = (
-        feature_importance.sort_values(
-            by="Importance",
-            ascending=False
+            "Importance":
+            rf_model.feature_importances_
+        })
+
+        feature_importance = (
+            feature_importance.sort_values(
+                by="Importance",
+                ascending=False
+            )
         )
-    )
 
-    # ==============================
-    # Save feature importance CSV
-    # ==============================
+        feature_importance.to_csv(
+            "reports/feature_importance.csv",
+            index=False
+        )
 
-    feature_importance.to_csv(
-        "reports/feature_importance.csv",
-        index=False
-    )
+        plt.figure(figsize=(10, 6))
 
-    # ==============================
-    # Save feature importance plot
-    # ==============================
+        plt.bar(
+            feature_importance["Feature"],
+            feature_importance["Importance"]
+        )
 
-    plt.figure(figsize=(10, 6))
+        plt.xticks(rotation=45)
 
-    plt.bar(
-        feature_importance["Feature"],
-        feature_importance["Importance"]
-    )
+        plt.xlabel("Features")
 
-    plt.xticks(rotation=45)
+        plt.ylabel("Importance")
 
-    plt.xlabel("Features")
+        plt.title(
+            "Feature Importance for "
+            "Battery RUL Prediction"
+        )
 
-    plt.ylabel("Importance")
+        plt.tight_layout()
 
-    plt.title(
-        "Feature Importance for "
-        "Battery RUL Prediction"
-    )
+        plt.savefig(
+            "reports/feature_importance.png"
+        )
 
-    plt.tight_layout()
+        plt.close()
 
-    plt.savefig(
-        "reports/feature_importance.png"
-    )
+        print(
+            "Feature importance saved "
+            "to reports/feature_importance.csv"
+        )
 
-    plt.close()
+        print(
+            "Feature importance plot saved "
+            "to reports/feature_importance.png"
+        )
 
-    print(
-        "Model comparison saved "
-        "to reports/model_comparison.csv"
-    )
 
-    print(
-        "Final test results saved "
-        "to reports/final_test_results.csv"
-    )
-
-    print(
-        "Feature importance saved "
-        "to reports/feature_importance.csv"
-    )
-
-    print(
-        "Feature importance plot saved "
-        "to reports/feature_importance.png"
-    )
-
+# ==========================================
+# Run main
+# ==========================================
 
 if __name__ == "__main__":
 
