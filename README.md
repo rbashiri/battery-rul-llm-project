@@ -510,3 +510,20 @@ The final application successfully integrates:
 - machine learning inference,
 - engineering response generation,
 - and interactive web deployment.
+## Stage 4: Testing
+
+The project includes pytest tests for preprocessing, model prediction, and interface parsing.
+
+Test coverage includes:
+- missing value handling
+- dataframe integrity checks
+- numeric scaling shape validation
+- trained model file existence
+- model prediction type and shape
+- natural language feature extraction
+- missing feature detection
+
+All tests pass using:
+
+```bash
+python -m pytest tests/ -v
