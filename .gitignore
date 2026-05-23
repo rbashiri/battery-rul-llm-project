@@ -23,6 +23,7 @@ models/
 
 # MLflow tracking files
 mlruns/
+mlflow.db
 
 # Jupyter files
 .ipynb_checkpoints/
