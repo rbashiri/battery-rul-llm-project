@@ -526,4 +526,87 @@ Test coverage includes:
 All tests pass using:
 
 ```bash
-python -m pytest tests/ -v
+python -m pytest tests/ -v 
+## Configuration Management with YAML
+
+The training pipeline uses a YAML configuration file to manage dataset paths, target column name, train/test split settings, and model hyperparameters.
+
+This avoids hardcoding important training values directly inside `src/train.py`.
+
+The configuration file is located at:
+
+```text
+configs/config.yaml
+```
+
+Example configuration:
+
+```yaml
+data:
+  input_path: "/home/susan/battery-rul-llm-project/data/processed/battery_cleaned.csv"
+  target_column: "RUL"
+  test_size: 0.2
+  validation_size: 0.2
+  random_state: 42
+
+model:
+  random_forest:
+    n_estimators: 100
+    max_depth: 10
+    random_state: 42
+
+  gradient_boosting:
+    n_estimators: 100
+    learning_rate: 0.1
+    max_depth: 3
+    random_state: 42
+```
+
+In `src/train.py`, the configuration is loaded using:
+
+```python
+import yaml
+
+with open("configs/config.yaml", "r") as file:
+    config = yaml.safe_load(file)
+```
+
+The training script then reads values from the YAML file:
+
+```python
+input_path = config["data"]["input_path"]
+target_column = config["data"]["target_column"]
+test_size = config["data"]["test_size"]
+validation_size = config["data"]["validation_size"]
+random_state = config["data"]["random_state"]
+```
+
+Model hyperparameters are also read from the YAML file:
+
+```python
+RandomForestRegressor(
+    n_estimators=config["model"]["random_forest"]["n_estimators"],
+    max_depth=config["model"]["random_forest"]["max_depth"],
+    random_state=config["model"]["random_forest"]["random_state"]
+)
+```
+
+This makes the training pipeline easier to maintain, reproduce, and modify without changing the Python source code.
+
+---
+
+## How to Run Training with YAML Configuration
+
+The YAML file is not run directly. Instead, run the training script:
+
+```bash
+python src/train.py
+```
+
+The script automatically reads:
+
+```text
+configs/config.yaml
+```
+
+and uses the values defined there for data loading, splitting, and model training.
