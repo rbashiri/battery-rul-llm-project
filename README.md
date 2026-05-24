@@ -347,8 +347,6 @@ cd ~/battery-rul-llm-project
 source .venv/bin/activate
 ```
 
----
-
 ## Step 2: Run Streamlit Application
 
 ```bash
@@ -367,35 +365,6 @@ charge voltage 4.1, charge temperature 30,
 discharge current 1.2, discharge voltage 3.7,
 discharge temperature 28, battery capacity time 250,
 and SOH 85.
-```
-
-``` response
-Prediction Result
-Predicted Remaining Useful Life: 70.62 cycles
-
-Battery Status: High degradation
-
-Explanation:
-The battery has a low remaining useful life. This suggests significant degradation, reduced capacity, and possible need for replacement or maintenance soon.
-```
-
-## Example 2
-
-```text
-Battery cycle 250, charge current 2.0,
-charge voltage 4.0, SOH 70,
-discharge voltage 3.5, discharge current 1.8,
-charge temperature 35, discharge temperature 32,
-capacity time 180.
-```
-``` response
-Prediction Result
-Predicted Remaining Useful Life: -78.66 cycles
-
-Battery Status: High degradation
-
-Explanation:
-The battery has a low remaining useful life. This suggests significant degradation, reduced capacity, and possible need for replacement or maintenance soon.
 ```
 -------
 
@@ -633,6 +602,8 @@ My next goal is to revisit all previous sprints and practice rebuilding parts of
 
 I would appreciate any feedback or suggestions on how I can improve this project further and continue growing in future machine learning and data science projects.
 
-
+Final Deliverabel:
+Demo link : https://drive.google.com/file/d/1ZPTcLsBfw9UJ6Fq_E0S1VwtCMmApAQBR/view?usp=sharing
 Robabeh 
+
 5/23/2026
